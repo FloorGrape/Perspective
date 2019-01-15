@@ -3,6 +3,7 @@
 #include "FPCharacter.h"
 #include "Perspective.h"
 #include "Components/InputComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values
 AFPCharacter::AFPCharacter()
@@ -10,6 +11,12 @@ AFPCharacter::AFPCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	//visibleComponent = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
+	//RootComponent = visibleComponent;
+
+	/*cameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
+	cameraComponent->SetupAttachment(RootComponent);
+	cameraComponent->bUsePawnControlRotation = true;*/
 }
 
 // Called when the game starts or when spawned
@@ -25,46 +32,47 @@ void AFPCharacter::BeginPlay()
 }
 
 // Called every frame
-void AFPCharacter::Tick(float DeltaTime)
+void AFPCharacter::Tick(float deltaTime_)
 {
-	Super::Tick(DeltaTime);
+	Super::Tick(deltaTime_);
 
 }
 
 // Called to bind functionality to input
-void AFPCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AFPCharacter::SetupPlayerInputComponent(UInputComponent* playerInputComponent_)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	Super::SetupPlayerInputComponent(playerInputComponent_);
 
 	//Players movement bindings.
-	PlayerInputComponent->BindAxis("MoveForward", this, &AFPCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &AFPCharacter::MoveRight);
+	playerInputComponent_->BindAxis("MoveForward", this, &AFPCharacter::MoveForward);
+	playerInputComponent_->BindAxis("MoveRight", this, &AFPCharacter::MoveRight);
 
 	//Players look bindings.
-	PlayerInputComponent->BindAxis("Turn", this, &AFPCharacter::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("LookUp", this, &AFPCharacter::AddControllerPitchInput);
+	playerInputComponent_->BindAxis("Turn", this, &AFPCharacter::AddControllerYawInput);
+	playerInputComponent_->BindAxis("LookUp", this, &AFPCharacter::AddControllerPitchInput);
 
 	//Players jump bindings.
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AFPCharacter::StartJump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AFPCharacter::StopJump);
+	playerInputComponent_->BindAction("Jump", IE_Pressed, this, &AFPCharacter::StartJump);
+	playerInputComponent_->BindAction("Jump", IE_Released, this, &AFPCharacter::StopJump);
 
-	PlayerInputComponent->BindAction("Run", IE_Pressed, this, &AFPCharacter::StartSprint);
-	PlayerInputComponent->BindAction("Run", IE_Released, this, &AFPCharacter::StopSprint);
+	playerInputComponent_->BindAction("Run", IE_Pressed, this, &AFPCharacter::StartSprint);
+	playerInputComponent_->BindAction("Run", IE_Released, this, &AFPCharacter::StopSprint);
 
+	playerInputComponent_->BindAction("Interact", IE_Pressed, this, &AFPCharacter::CastRay);
 }
 
-void AFPCharacter::MoveForward(float Value)
+void AFPCharacter::MoveForward(float value_)
 {
 	// Find out which way is "forward" and record that the player wants to move that way.
 	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::X);
-	AddMovementInput(Direction, Value);
+	AddMovementInput(Direction, value_);
 }
 
-void AFPCharacter::MoveRight(float Value)
+void AFPCharacter::MoveRight(float value_)
 {
 	// Find out which way is "right" and record that the player wants to move that way.
 	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
-	AddMovementInput(Direction, Value);
+	AddMovementInput(Direction, value_);
 }
 
 void AFPCharacter::StartJump() {
@@ -84,4 +92,18 @@ void AFPCharacter::StopSprint() {
 
 	GetCharacterMovement()->MaxWalkSpeed = maxWalkSpeed;
 
+}
+
+void AFPCharacter::CastRay()
+{
+	FVector startLocation_ = GetActorLocation() + BaseEyeHeight;
+	FVector endLocation_ = startLocation_ + (GetActorForwardVector() * 4000.0f);
+	FHitResult hit_;
+
+	FCollisionQueryParams collisionParams_;
+	collisionParams_.AddIgnoredActor(this);
+
+	GetWorld()->LineTraceSingleByChannel(hit_, startLocation_, endLocation_, ECC_Visibility, collisionParams_);
+
+	UKismetSystemLibrary::DrawDebugLine(GetWorld(), startLocation_, hit_.Location, FColor::Red, 3.0f, 3.0f);
 }
