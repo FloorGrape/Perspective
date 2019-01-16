@@ -14,9 +14,9 @@ AFPCharacter::AFPCharacter()
 	//visibleComponent = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	//RootComponent = visibleComponent;
 
-	/*cameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
+	cameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	cameraComponent->SetupAttachment(RootComponent);
-	cameraComponent->bUsePawnControlRotation = true;*/
+	cameraComponent->bUsePawnControlRotation = true;
 }
 
 // Called when the game starts or when spawned
@@ -96,8 +96,8 @@ void AFPCharacter::StopSprint() {
 
 void AFPCharacter::CastRay()
 {
-	FVector startLocation_ = GetActorLocation() + BaseEyeHeight;
-	FVector endLocation_ = startLocation_ + (GetActorForwardVector() * 4000.0f);
+	FVector startLocation_ = cameraComponent->GetComponentLocation();
+	FVector endLocation_ = startLocation_ + (cameraComponent->GetForwardVector() * 4000.0f);
 	FHitResult hit_;
 
 	FCollisionQueryParams collisionParams_;

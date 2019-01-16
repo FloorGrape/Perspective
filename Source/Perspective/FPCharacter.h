@@ -32,8 +32,8 @@ public:
 	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		UStaticMeshComponent* visibleComponent;*/
 
-	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		UCameraComponent* cameraComponent;*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		UCameraComponent* cameraComponent;
 
 	//Handles forward and backward movement
 	UFUNCTION()

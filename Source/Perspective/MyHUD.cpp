@@ -21,7 +21,7 @@ void AMyHUD::DrawHUD() {
 	const FVector2D center(Canvas->ClipX * 0.5, Canvas->ClipY * 0.5);
 
 	//Must offset by half of the texture's dimensions so that it will allign at the center.
-	const FVector2D crosshairDrawPosition((center.X - (crossHair->GetSurfaceWidth() * 0.5)), (center.Y - (crossHair->GetSurfaceHeight * 0.5)));
+	const FVector2D crosshairDrawPosition((center.X - (crossHair->GetSurfaceWidth() * 0.5)), (center.Y - (crossHair->GetSurfaceHeight() * 0.5)));
 
 	//Create a tile item for the canvas and give it the crosshair position and texture.
 	FCanvasTileItem TileItem(crosshairDrawPosition, crossHair->Resource, FLinearColor::White);
