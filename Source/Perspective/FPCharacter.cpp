@@ -8,14 +8,14 @@
 // Sets default values
 AFPCharacter::AFPCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	//visibleComponent = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	//RootComponent = visibleComponent;
 
 	cameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
-	cameraComponent->SetupAttachment(RootComponent);
+	cameraComponent->SetupAttachment(GetCapsuleComponent());
 	cameraComponent->bUsePawnControlRotation = true;
 }
 
@@ -23,7 +23,7 @@ AFPCharacter::AFPCharacter()
 void AFPCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	if (GEngine) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("We are using FPSCharacter."));
 	}
@@ -75,29 +75,30 @@ void AFPCharacter::MoveRight(float value_)
 	AddMovementInput(Direction, value_);
 }
 
-void AFPCharacter::StartJump() {
+void AFPCharacter::StartJump() 
+{
 	bPressedJump = true;
 }
 
-void AFPCharacter::StopJump() {
+void AFPCharacter::StopJump() 
+{
 	bPressedJump = false;
 }
 
-void AFPCharacter::StartSprint() {
-	
+void AFPCharacter::StartSprint() 
+{
 	GetCharacterMovement()->MaxWalkSpeed = maxWalkSpeed * sprintModifier;
 }
 
-void AFPCharacter::StopSprint() {
-
+void AFPCharacter::StopSprint() 
+{
 	GetCharacterMovement()->MaxWalkSpeed = maxWalkSpeed;
-
 }
 
 void AFPCharacter::CastRay()
 {
 	FVector startLocation_ = cameraComponent->GetComponentLocation();
-	FVector endLocation_ = startLocation_ + (cameraComponent->GetForwardVector() * 4000.0f);
+	FVector endLocation_ = startLocation_ + (cameraComponent->GetForwardVector() * 200.0f);
 	FHitResult hit_;
 
 	FCollisionQueryParams collisionParams_;
@@ -105,5 +106,5 @@ void AFPCharacter::CastRay()
 
 	GetWorld()->LineTraceSingleByChannel(hit_, startLocation_, endLocation_, ECC_Visibility, collisionParams_);
 
-	UKismetSystemLibrary::DrawDebugLine(GetWorld(), startLocation_, hit_.Location, FColor::Red, 3.0f, 3.0f);
+	UKismetSystemLibrary::DrawDebugLine(GetWorld(), startLocation_, endLocation_, FColor::Red, 3.0f, 3.0f);
 }
