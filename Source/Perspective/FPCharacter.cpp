@@ -16,6 +16,7 @@ AFPCharacter::AFPCharacter()
 
 	cameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	cameraComponent->SetupAttachment(GetCapsuleComponent());
+	cameraComponent->SetRelativeLocation(FVector(10.0f, 0.0f, 30.0f + BaseEyeHeight));
 	cameraComponent->bUsePawnControlRotation = true;
 }
 
