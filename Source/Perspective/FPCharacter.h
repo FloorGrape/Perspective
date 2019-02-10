@@ -2,11 +2,14 @@
 
 #pragma once
 
-#include "Engine.h"
-
 #include "CoreMinimal.h"
+#include "Engine.h"
+#include "Switch.h"
 #include "GameFramework/Character.h"
 #include "FPCharacter.generated.h"
+
+#define MAX_WALK_SPD 1.0f
+#define SPRINT_MOD 5.0f
 
 
 UCLASS()
@@ -19,21 +22,27 @@ public:
 	AFPCharacter();
 
 protected:
+
+	UPROPERTY()
+		float maxWalkSpeed = MAX_WALK_SPD;
+
+	UPROPERTY()
+		float sprintModifier = SPRINT_MOD;
+
+	UPROPERTY(EditAnywhere)
+		UCameraComponent* cameraComponent;
+
+	UPROPERTY(EditAnywhere)
+		ASwitch* currentSwitch;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
 	// Called every frame
 	virtual void Tick(float deltaTime_) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* playerInputComponent_) override;
-
-	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		UStaticMeshComponent* visibleComponent;*/
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		UCameraComponent* cameraComponent;
 
 	//Handles forward and backward movement
 	UFUNCTION()
@@ -61,8 +70,4 @@ public:
 
 	UFUNCTION()
 		void CastRay();
-	
-private:
-	float maxWalkSpeed = 1.0f;
-	float sprintModifier = 5.0f;
 };

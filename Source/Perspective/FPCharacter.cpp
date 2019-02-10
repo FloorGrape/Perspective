@@ -37,6 +37,7 @@ void AFPCharacter::Tick(float deltaTime_)
 {
 	Super::Tick(deltaTime_);
 
+	CastRay();
 }
 
 // Called to bind functionality to input
@@ -100,12 +101,18 @@ void AFPCharacter::CastRay()
 {
 	FVector startLocation_ = cameraComponent->GetComponentLocation();
 	FVector endLocation_ = startLocation_ + (cameraComponent->GetForwardVector() * 200.0f);
-	FHitResult hit_;
 
+	UKismetSystemLibrary::DrawDebugLine(GetWorld(), startLocation_, endLocation_, FColor::Red, 1.0f, 3.0f);
+
+	FHitResult hit_;
 	FCollisionQueryParams collisionParams_;
 	collisionParams_.AddIgnoredActor(this);
 
-	GetWorld()->LineTraceSingleByChannel(hit_, startLocation_, endLocation_, ECC_Visibility, collisionParams_);
+	if (GetWorld()->LineTraceSingleByChannel(hit_, startLocation_, endLocation_, ECC_Visibility, collisionParams_))
+	{
+		if (hit_.GetActor()->GetClass()->IsChildOf(ASwitch::StaticClass()))
+		{
 
-	UKismetSystemLibrary::DrawDebugLine(GetWorld(), startLocation_, endLocation_, FColor::Red, 3.0f, 3.0f);
+		}
+	}
 }
