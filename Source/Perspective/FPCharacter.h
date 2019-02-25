@@ -10,7 +10,7 @@
 
 #define MAX_WALK_SPD 1.0f
 #define SPRINT_MOD 5.0f
-
+#define TRACE_DIST 1000.0f
 
 UCLASS()
 class PERSPECTIVE_API AFPCharacter : public ACharacter
@@ -28,6 +28,9 @@ protected:
 
 	UPROPERTY()
 		float sprintModifier = SPRINT_MOD;
+
+	UPROPERTY()
+		float maxInteractionDist = TRACE_DIST;
 
 	UPROPERTY(EditAnywhere)
 		UCameraComponent* cameraComponent;

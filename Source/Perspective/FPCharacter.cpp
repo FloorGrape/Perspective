@@ -100,7 +100,7 @@ void AFPCharacter::StopSprint()
 void AFPCharacter::CastRay()
 {
 	FVector startLocation_ = cameraComponent->GetComponentLocation();
-	FVector endLocation_ = startLocation_ + (cameraComponent->GetForwardVector() * 200.0f);
+	FVector endLocation_ = startLocation_ + (cameraComponent->GetForwardVector() * maxInteractionDist);
 
 	UKismetSystemLibrary::DrawDebugLine(GetWorld(), startLocation_, endLocation_, FColor::Red, 1.0f, 3.0f);
 
