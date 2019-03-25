@@ -45,7 +45,6 @@ void AFPCharacter::BeginPlay()
 void AFPCharacter::Tick(float deltaTime_)
 {
 	Super::Tick(deltaTime_);
-
 	start = cameraComponent->GetComponentLocation();
 	end = start + forwardVec * maxInteractionDist;
 	forwardVec = cameraComponent->GetForwardVector();
