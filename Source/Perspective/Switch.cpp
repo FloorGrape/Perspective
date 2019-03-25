@@ -11,6 +11,7 @@ ASwitch::ASwitch()
 	isActive = false;
 
 	visibleComponent = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
+	visibleComponent->SetSimulatePhysics(false);
 	RootComponent = visibleComponent;
 }
 

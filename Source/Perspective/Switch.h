@@ -28,10 +28,10 @@ public:
 	// Called every frame
 	virtual void Tick(float deltaTime_) override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere)
 		UStaticMeshComponent* visibleComponent;
 
-	bool GetActiveState()
+	bool GetActiveState() const
 	{
 		return isActive;
 	}
