@@ -5,38 +5,60 @@
 #include "CoreMinimal.h"
 #include "Engine.h"
 #include "Switch.h"
+#include "InteractableObject.h"
 #include "GameFramework/Character.h"
 #include "FPCharacter.generated.h"
-
-#define MAX_WALK_SPD 1.0f
-#define SPRINT_MOD 5.0f
-#define TRACE_DIST 1000.0f
 
 UCLASS()
 class PERSPECTIVE_API AFPCharacter : public ACharacter
 {
 	GENERATED_BODY()
-		
-public:
-	// Sets default values for this character's properties
-	AFPCharacter();
-
-protected:
 
 	UPROPERTY()
-		float maxWalkSpeed = MAX_WALK_SPD;
+		float maxWalkSpeed = 1.0f;
 
 	UPROPERTY()
-		float sprintModifier = SPRINT_MOD;
+		float sprintModifier = 5.0f;
 
 	UPROPERTY()
-		float maxInteractionDist = TRACE_DIST;
+		float maxInteractionDist = 500.0f;
 
 	UPROPERTY(EditAnywhere)
 		UCameraComponent* cameraComponent;
 
 	UPROPERTY(EditAnywhere)
 		ASwitch* currentSwitch;
+
+	UPROPERTY(EditAnywhere)
+		class USceneComponent* holdingComponent;
+		
+public:
+	// Sets default values for this character's properties
+	AFPCharacter();
+
+	UPROPERTY(EditAnywhere)
+		class AInteractableObject* currentItem;
+
+	bool bCanMove;
+	bool bHoldingItem;
+	bool bInspecting;
+
+	float pitchMax;
+	float pitchMin;
+
+	FVector holdingComp;
+	FRotator lastRotation;
+
+	FVector start;
+	FVector forwardVec;
+	FVector end;
+
+	FHitResult hit;
+
+	FComponentQueryParams defaultComponentQueryParams;
+	FCollisionResponseParams defaultResponseParams;
+
+protected:
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -73,4 +95,11 @@ protected:
 
 	UFUNCTION()
 		void CastRay();
+
+	void OnInteract();
+	void OnInspect();
+	void OnInspectReleased();
+
+	void ToggleMovement();
+	void ToggleItemPickup();
 };

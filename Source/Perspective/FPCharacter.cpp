@@ -18,6 +18,14 @@ AFPCharacter::AFPCharacter()
 	cameraComponent->SetupAttachment(GetCapsuleComponent());
 	cameraComponent->SetRelativeLocation(FVector(10.0f, 0.0f, 30.0f + BaseEyeHeight));
 	cameraComponent->bUsePawnControlRotation = true;
+
+	holdingComponent = CreateDefaultSubobject<USceneComponent>(TEXT("HoldingComponent"));
+	holdingComponent->SetupAttachment(RootComponent);
+	holdingComponent->SetRelativeLocation(FVector(150.0f, 0.1f, 10.0f));
+
+	currentItem = NULL;
+	bCanMove = true;
+	bInspecting = false;
 }
 
 // Called when the game starts or when spawned
@@ -29,7 +37,8 @@ void AFPCharacter::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("We are using FPSCharacter."));
 	}
 
-	maxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
+	pitchMax = GetWorld()->GetFirstPlayerController()->PlayerCameraManager->ViewPitchMax;
+	pitchMin = GetWorld()->GetFirstPlayerController()->PlayerCameraManager->ViewPitchMin;
 }
 
 // Called every frame
@@ -37,7 +46,53 @@ void AFPCharacter::Tick(float deltaTime_)
 {
 	Super::Tick(deltaTime_);
 
-	CastRay();
+	start = cameraComponent->GetComponentLocation();
+	end = start + forwardVec * maxInteractionDist;
+	forwardVec = cameraComponent->GetForwardVector();
+
+	DrawDebugLine(GetWorld(), start, end, FColor::Red, 1.0f, 3.0f);
+
+	if (!bHoldingItem)
+	{
+		if (GetWorld()->LineTraceSingleByChannel(hit, start, end, ECC_Visibility, defaultComponentQueryParams, defaultResponseParams))
+		{
+			if (hit.GetActor()->GetClass()->IsChildOf(AInteractableObject::StaticClass()))
+			{
+				currentItem = Cast<AInteractableObject>(hit.GetActor());
+			}
+		}
+		else
+		{
+			currentItem = NULL;
+		}
+	}
+
+	if (bInspecting)
+	{
+		if (bHoldingItem)
+		{
+			cameraComponent->SetFieldOfView(FMath::Lerp(cameraComponent->FieldOfView, 90.0f, 0.1f));
+
+			holdingComponent->SetRelativeLocation(FVector(150.0f, 0.1f, 50.0f));
+
+			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->ViewPitchMax = 179.90000002f;
+			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->ViewPitchMin = -179.90000002f;
+			currentItem->RotateActor();
+		}
+		else
+		{
+			cameraComponent->SetFieldOfView(FMath::Lerp(cameraComponent->FieldOfView, 45.0f, 0.1f));
+		}
+	}
+	else
+	{
+		cameraComponent->SetFieldOfView(FMath::Lerp(cameraComponent->FieldOfView, 90.0f, 0.1f));
+
+		if (bHoldingItem)
+		{
+			holdingComponent->SetRelativeLocation(FVector(50.0f, 0.0f, 0.0f));
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -60,21 +115,29 @@ void AFPCharacter::SetupPlayerInputComponent(UInputComponent* playerInputCompone
 	playerInputComponent_->BindAction("Run", IE_Pressed, this, &AFPCharacter::StartSprint);
 	playerInputComponent_->BindAction("Run", IE_Released, this, &AFPCharacter::StopSprint);
 
-	playerInputComponent_->BindAction("Interact", IE_Pressed, this, &AFPCharacter::CastRay);
+	playerInputComponent_->BindAction("Interact", IE_Pressed, this, &AFPCharacter::OnInteract);
+	playerInputComponent_->BindAction("Inspect", IE_Pressed, this, &AFPCharacter::OnInspect);
+	playerInputComponent_->BindAction("Inspect", IE_Released, this, &AFPCharacter::OnInspectReleased);
 }
 
 void AFPCharacter::MoveForward(float value_)
 {
-	// Find out which way is "forward" and record that the player wants to move that way.
-	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::X);
-	AddMovementInput(Direction, value_);
+	if(value_ != 0.0f && bCanMove)
+	{
+		// Find out which way is "forward" and record that the player wants to move that way.
+		FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::X);
+		AddMovementInput(Direction, value_);
+	}
 }
 
 void AFPCharacter::MoveRight(float value_)
 {
-	// Find out which way is "right" and record that the player wants to move that way.
-	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
-	AddMovementInput(Direction, value_);
+	if(value_ != 0.0f && bCanMove)
+	{
+		// Find out which way is "right" and record that the player wants to move that way.
+		FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
+		AddMovementInput(Direction, value_);
+	}
 }
 
 void AFPCharacter::StartJump() 
@@ -99,20 +162,64 @@ void AFPCharacter::StopSprint()
 
 void AFPCharacter::CastRay()
 {
-	FVector startLocation_ = cameraComponent->GetComponentLocation();
-	FVector endLocation_ = startLocation_ + (cameraComponent->GetForwardVector() * maxInteractionDist);
+	
+}
 
-	UKismetSystemLibrary::DrawDebugLine(GetWorld(), startLocation_, endLocation_, FColor::Red, 1.0f, 3.0f);
-
-	FHitResult hit_;
-	FCollisionQueryParams collisionParams_;
-	collisionParams_.AddIgnoredActor(this);
-
-	if (GetWorld()->LineTraceSingleByChannel(hit_, startLocation_, endLocation_, ECC_Visibility, collisionParams_))
+void AFPCharacter::OnInteract()
+{
+	if(currentItem && !bInspecting)
 	{
-		if (hit_.GetActor()->GetClass()->IsChildOf(ASwitch::StaticClass()))
-		{
+		ToggleItemPickup();
+	}
+}
 
+void AFPCharacter::OnInspect()
+{
+	if(bHoldingItem)
+	{
+		lastRotation = GetControlRotation();
+		ToggleMovement();
+	}
+	else
+	{
+		bInspecting = true;
+	}
+}
+
+void AFPCharacter::OnInspectReleased()
+{
+	if(bInspecting && bHoldingItem)
+	{
+		GetController()->SetControlRotation(lastRotation);
+		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->ViewPitchMax = pitchMax;
+		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->ViewPitchMin = pitchMin;
+
+		ToggleMovement();
+	}
+	else
+	{
+		bInspecting = false;
+	}
+}
+
+void AFPCharacter::ToggleMovement()
+{
+	bCanMove = !bCanMove;
+	bInspecting = !bInspecting;
+	cameraComponent->bUsePawnControlRotation = !cameraComponent->bUsePawnControlRotation;
+	bUseControllerRotationYaw = !bUseControllerRotationYaw;
+}
+
+void AFPCharacter::ToggleItemPickup()
+{
+	if(currentItem)
+	{
+		bHoldingItem = !bHoldingItem;
+		currentItem->Pickup();
+
+		if(!bHoldingItem)
+		{
+			currentItem = NULL;
 		}
 	}
 }

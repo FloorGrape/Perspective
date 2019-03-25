@@ -4,12 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Camera/CameraComponent.h"
 #include "InteractableObject.generated.h"
+
+class ACharacter;
 
 UCLASS()
 class PERSPECTIVE_API AInteractableObject : public AActor
 {
-	GENERATED_BODY()
+GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
@@ -23,4 +26,23 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* mesh;
+
+	UPROPERTY(EditAnywhere)
+	USceneComponent* holdingComp;
+
+	UFUNCTION()
+	void RotateActor();
+
+	UFUNCTION()
+	void Pickup();
+
+	bool bHolding;
+	bool bGravity;
+
+	FRotator controlRot;
+	FVector forwardVec;
+	ACharacter* MyCharacter;
+	UCameraComponent* playerCam;
 };
