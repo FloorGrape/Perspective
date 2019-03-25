@@ -21,7 +21,7 @@ AFPCharacter::AFPCharacter()
 
 	holdingComponent = CreateDefaultSubobject<USceneComponent>(TEXT("HoldingComponent"));
 	holdingComponent->SetupAttachment(RootComponent);
-	holdingComponent->SetRelativeLocation(FVector(150.0f, 0.1f, 10.0f));
+	holdingComponent->SetRelativeLocation(FVector(250.0f, 0.1f, 10.0f));
 
 	currentItem = NULL;
 	bCanMove = true;
@@ -33,7 +33,8 @@ void AFPCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (GEngine) {
+	if (GEngine) 
+	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("We are using FPSCharacter."));
 	}
 
@@ -48,10 +49,10 @@ void AFPCharacter::Tick(float deltaTime_)
 	start = cameraComponent->GetComponentLocation();
 	end = start + forwardVec * maxInteractionDist;
 	forwardVec = cameraComponent->GetForwardVector();
+	
+	DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 0.1f, 0, 1);
 
-	DrawDebugLine(GetWorld(), start, end, FColor::Red, 1.0f, 3.0f);
-
-	if (!bHoldingItem)
+	/*if (!bHoldingItem)
 	{
 		if (GetWorld()->LineTraceSingleByChannel(hit, start, end, ECC_Visibility, defaultComponentQueryParams, defaultResponseParams))
 		{
@@ -72,7 +73,7 @@ void AFPCharacter::Tick(float deltaTime_)
 		{
 			cameraComponent->SetFieldOfView(FMath::Lerp(cameraComponent->FieldOfView, 90.0f, 0.1f));
 
-			holdingComponent->SetRelativeLocation(FVector(150.0f, 0.1f, 50.0f));
+			holdingComponent->SetRelativeLocation(FVector(250.0f, 0.3f, 50.0f));
 
 			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->ViewPitchMax = 179.90000002f;
 			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->ViewPitchMin = -179.90000002f;
@@ -91,7 +92,7 @@ void AFPCharacter::Tick(float deltaTime_)
 		{
 			holdingComponent->SetRelativeLocation(FVector(50.0f, 0.0f, 0.0f));
 		}
-	}
+	}*/
 }
 
 // Called to bind functionality to input

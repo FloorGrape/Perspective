@@ -39,7 +39,9 @@ public:
 	UPROPERTY(EditAnywhere)
 		class AInteractableObject* currentItem;
 
-	bool bCanMove;
+	UPROPERTY(EditAnywhere)
+		bool bCanMove;
+
 	bool bHoldingItem;
 	bool bInspecting;
 
