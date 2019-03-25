@@ -36,6 +36,17 @@ void AFPCharacter::Tick(float deltaTime_)
 {
 	Super::Tick(deltaTime_);
 
+	//
+
+	//
+
+	//
+
+	//
+
+	
+
+
 }
 
 // Called to bind functionality to input
