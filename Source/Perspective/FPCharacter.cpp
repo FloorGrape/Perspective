@@ -20,8 +20,8 @@ AFPCharacter::AFPCharacter()
 	cameraComponent->bUsePawnControlRotation = true;
 
 	holdingComponent = CreateDefaultSubobject<USceneComponent>(TEXT("HoldingComponent"));
-	holdingComponent->SetupAttachment(RootComponent);
-	holdingComponent->SetRelativeLocation(FVector(250.0f, 0.1f, 10.0f));
+	holdingComponent->SetupAttachment(cameraComponent);
+	holdingComponent->SetRelativeLocation(FVector(250.0f, 0.0f, -40.0f));
 
 	currentItem = NULL;
 	bCanMove = true;
@@ -47,19 +47,16 @@ void AFPCharacter::Tick(float deltaTime_)
 {
 	Super::Tick(deltaTime_);
 	start = cameraComponent->GetComponentLocation();
-	end = start + forwardVec * maxInteractionDist;
 	forwardVec = cameraComponent->GetForwardVector();
+	end = start + forwardVec * maxInteractionDist;
 	
-	DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 0.1f, 0, 1);
+	//DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 0.1f, 0, 1);
 
-	/*if (!bHoldingItem)
+	if (!bHoldingItem)
 	{
 		if (GetWorld()->LineTraceSingleByChannel(hit, start, end, ECC_Visibility, defaultComponentQueryParams, defaultResponseParams))
 		{
-			if (hit.GetActor()->GetClass()->IsChildOf(AInteractableObject::StaticClass()))
-			{
-				currentItem = Cast<AInteractableObject>(hit.GetActor());
-			}
+			currentItem = Cast<AInteractableObject>(hit.GetActor());
 		}
 		else
 		{
@@ -73,8 +70,6 @@ void AFPCharacter::Tick(float deltaTime_)
 		{
 			cameraComponent->SetFieldOfView(FMath::Lerp(cameraComponent->FieldOfView, 90.0f, 0.1f));
 
-			holdingComponent->SetRelativeLocation(FVector(250.0f, 0.3f, 50.0f));
-
 			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->ViewPitchMax = 179.90000002f;
 			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->ViewPitchMin = -179.90000002f;
 			currentItem->RotateActor();
@@ -87,12 +82,7 @@ void AFPCharacter::Tick(float deltaTime_)
 	else
 	{
 		cameraComponent->SetFieldOfView(FMath::Lerp(cameraComponent->FieldOfView, 90.0f, 0.1f));
-
-		if (bHoldingItem)
-		{
-			holdingComponent->SetRelativeLocation(FVector(50.0f, 0.0f, 0.0f));
-		}
-	}*/
+	}
 }
 
 // Called to bind functionality to input
@@ -158,11 +148,6 @@ void AFPCharacter::StartSprint()
 void AFPCharacter::StopSprint() 
 {
 	GetCharacterMovement()->MaxWalkSpeed = maxWalkSpeed;
-}
-
-void AFPCharacter::CastRay()
-{
-	
 }
 
 void AFPCharacter::OnInteract()

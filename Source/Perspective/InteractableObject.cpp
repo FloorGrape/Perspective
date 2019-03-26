@@ -24,20 +24,29 @@ void AInteractableObject::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	Init();
+}
+
+void AInteractableObject::Init()
+{
 	MyCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
-	playerCam = MyCharacter->FindComponentByClass<UCameraComponent>();
 
-	TArray<USceneComponent*> components;
-
-	MyCharacter->GetComponents(components);
-
-	if(components.Num() > 0)
+	if (MyCharacter)
 	{
-		for(auto& comp : components)
+		playerCam = MyCharacter->FindComponentByClass<UCameraComponent>();
+
+		TArray<USceneComponent*> components;
+
+		MyCharacter->GetComponents(components);
+
+		if (components.Num() > 0)
 		{
-			if(comp->GetName() == "HoldingComponent")
+			for (auto& comp : components)
 			{
-				holdingComp = Cast<USceneComponent>(comp);
+				if (comp->GetName() == "HoldingComponent")
+				{
+					holdingComp = Cast<USceneComponent>(comp);
+				}
 			}
 		}
 	}
@@ -47,6 +56,11 @@ void AInteractableObject::BeginPlay()
 void AInteractableObject::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if(!MyCharacter)
+	{
+		Init();
+	}
 
 	if(bHolding && holdingComp)
 	{

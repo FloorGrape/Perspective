@@ -14,13 +14,13 @@ class PERSPECTIVE_API AFPCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
-		float maxWalkSpeed = 1.0f;
+	UPROPERTY(VisibleAnywhere)
+		float maxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 		float sprintModifier = 5.0f;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 		float maxInteractionDist = 500.0f;
 
 	UPROPERTY(EditAnywhere)
@@ -52,7 +52,10 @@ public:
 	FRotator lastRotation;
 
 	FVector start;
-	FVector forwardVec;
+
+	UPROPERTY(VisibleAnywhere)
+		FVector forwardVec;
+
 	FVector end;
 
 	FHitResult hit;
@@ -94,9 +97,6 @@ protected:
 
 	UFUNCTION()
 		void StopSprint();
-
-	UFUNCTION()
-		void CastRay();
 
 	void OnInteract();
 	void OnInspect();
