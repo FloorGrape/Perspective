@@ -80,12 +80,13 @@ void AInteractableObject::Pickup()
 	bGravity = !bGravity;
 	mesh->SetEnableGravity(bGravity);
 	mesh->SetSimulatePhysics(bHolding ? false : true);
-	mesh->SetCollisionEnabled(bHolding ? ECollisionEnabled::NoCollision : ECollisionEnabled::QueryAndPhysics);
+	//mesh->SetCollisionEnabled(bHolding ? ECollisionEnabled::NoCollision : ECollisionEnabled::QueryAndPhysics);
+	mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	if(!bHolding)
 	{
 		forwardVec = playerCam->GetForwardVector();
-		mesh->AddForce(forwardVec * 1000 * mesh->GetMass());
+		mesh->AddForce(forwardVec * 100000 * mesh->GetMass());
 	}
 }
 
