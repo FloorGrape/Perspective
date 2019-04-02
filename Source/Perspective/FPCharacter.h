@@ -15,7 +15,7 @@ class PERSPECTIVE_API AFPCharacter : public ACharacter
 	GENERATED_BODY()
 
 	UPROPERTY(VisibleAnywhere)
-		float maxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
+		float maxWalkSpeed = 5.0f;
 
 	UPROPERTY(VisibleAnywhere)
 		float sprintModifier = 5.0f;

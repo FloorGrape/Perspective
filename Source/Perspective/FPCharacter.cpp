@@ -24,7 +24,7 @@ AFPCharacter::AFPCharacter()
 	holdingComponent->SetRelativeLocation(FVector(250.0f, 0.0f, -40.0f));
 	//holdingComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 
-	currentItem = NULL;
+	currentItem = nullptr;
 	bCanMove = true;
 	bInspecting = false;
 }
@@ -51,18 +51,23 @@ void AFPCharacter::Tick(float deltaTime_)
 	forwardVec = cameraComponent->GetForwardVector();
 	end = start + forwardVec * maxInteractionDist;
 	
-	//DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 0.1f, 0, 1);
+	DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 0.1f, 0, 1);
 
 	if (!bHoldingItem)
 	{
 		if (GetWorld()->LineTraceSingleByChannel(hit, start, end, ECC_Visibility, defaultComponentQueryParams, defaultResponseParams))
 		{
 			currentItem = Cast<AInteractableObject>(hit.GetActor());
-			holdingComponent->SetRelativeLocation(hit.GetActor()->GetTransform().InverseTransformPosition(hit.GetActor()->GetActorLocation()));
+			if (currentItem) {
+				holdingComponent->SetRelativeLocation(GetTransform().InverseTransformPosition(hit.GetActor()->GetActorLocation()));
+			}
+			if (GEngine) {
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Hit."));
+			}
 		}
 		else
 		{
-			currentItem = NULL;
+			currentItem = nullptr;
 		}
 	}
 
@@ -206,7 +211,7 @@ void AFPCharacter::ToggleItemPickup()
 
 		if(!bHoldingItem)
 		{
-			currentItem = NULL;
+			currentItem = nullptr;
 		}
 	}
 }

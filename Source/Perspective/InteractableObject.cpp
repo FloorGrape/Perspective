@@ -87,7 +87,7 @@ void AInteractableObject::Pickup()
 	if(!bHolding)
 	{
 		forwardVec = playerCam->GetForwardVector();
-		mesh->AddForce(forwardVec * 100000 * mesh->GetMass());
+		//mesh->AddForce(forwardVec * 100000 * mesh->GetMass());
 	}
 }
 
