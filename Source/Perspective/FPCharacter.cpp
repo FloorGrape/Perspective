@@ -22,6 +22,7 @@ AFPCharacter::AFPCharacter()
 	holdingComponent = CreateDefaultSubobject<USceneComponent>(TEXT("HoldingComponent"));
 	holdingComponent->SetupAttachment(cameraComponent);
 	holdingComponent->SetRelativeLocation(FVector(250.0f, 0.0f, -40.0f));
+	//holdingComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 
 	currentItem = NULL;
 	bCanMove = true;
@@ -57,6 +58,7 @@ void AFPCharacter::Tick(float deltaTime_)
 		if (GetWorld()->LineTraceSingleByChannel(hit, start, end, ECC_Visibility, defaultComponentQueryParams, defaultResponseParams))
 		{
 			currentItem = Cast<AInteractableObject>(hit.GetActor());
+			holdingComponent->SetRelativeLocation(hit.GetActor()->GetTransform().InverseTransformPosition(hit.GetActor()->GetActorLocation()));
 		}
 		else
 		{

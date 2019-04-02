@@ -21,7 +21,7 @@ class PERSPECTIVE_API AFPCharacter : public ACharacter
 		float sprintModifier = 5.0f;
 
 	UPROPERTY(VisibleAnywhere)
-		float maxInteractionDist = 500.0f;
+		float maxInteractionDist = 5000.0f;
 
 	UPROPERTY(EditAnywhere)
 		UCameraComponent* cameraComponent;

@@ -79,7 +79,8 @@ void AInteractableObject::Pickup()
 	bHolding = !bHolding;
 	bGravity = !bGravity;
 	mesh->SetEnableGravity(bGravity);
-	mesh->SetSimulatePhysics(bHolding ? false : true);
+	//mesh->SetSimulatePhysics(bHolding ? false : true);
+	mesh->SetSimulatePhysics(true);
 	//mesh->SetCollisionEnabled(bHolding ? ECollisionEnabled::NoCollision : ECollisionEnabled::QueryAndPhysics);
 	mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
