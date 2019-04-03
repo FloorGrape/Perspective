@@ -21,7 +21,7 @@ class PERSPECTIVE_API AFPCharacter : public ACharacter
 		float sprintModifier = 3.0f;
 
 	UPROPERTY(VisibleAnywhere)
-		float maxInteractionDist = 10000.0f;
+		float maxInteractionDist = 5000.0f;
 
 	UPROPERTY(EditAnywhere)
 		UCameraComponent* cameraComponent;
@@ -58,6 +58,8 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 		float distance;
+
+	float angularSize;
 
 	float vertFOV = 59.0f;
 
@@ -113,5 +115,7 @@ protected:
 
 	void ToggleMovement();
 	void ToggleItemPickup();
-	void OnForcePerspective(AInteractableObject* object_);
+	void OnForcePerspective(AInteractableObject* object_, float& angSize_);
+	FVector GroundCheck(FHitResult ht_);
+	float AngularSize();
 };

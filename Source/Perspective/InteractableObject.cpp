@@ -98,6 +98,7 @@ void AInteractableObject::Pickup()
 	if(!bHolding)
 	{
 		forwardVec = playerCam->GetForwardVector();
+		SetOriginScale(this->GetRootComponent()->GetComponentScale());
 	}
 }
 
@@ -109,5 +110,15 @@ void AInteractableObject::SetInspecting(bool v_)
 void AInteractableObject::SetScaleFactor(const float scale_)
 {
 	scaleFactor = scale_;
+}
+
+void AInteractableObject::SetOriginScale(FVector oldScale_)
+{
+	originScale = oldScale_;
+}
+
+FVector AInteractableObject::GetOriginScale()
+{
+	return originScale;
 }
 

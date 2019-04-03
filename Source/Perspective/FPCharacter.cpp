@@ -5,6 +5,7 @@
 #include "Components/InputComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include <string>
+#include <OpenGL/GLES2/gl2ext.h>
 
 // Sets default values
 AFPCharacter::AFPCharacter()
@@ -78,12 +79,14 @@ void AFPCharacter::Tick(float deltaTime_)
 		if (currentItem)
 		{
 			holdingCollisionQueryParams.AddIgnoredActor(currentItem);
-			end = start + forwardVec * 10000.0f;
+			end = start + forwardVec * maxInteractionDist;
 
 			if (GetWorld()->LineTraceSingleByChannel(hitBlue, start, end, ECC_Visibility, holdingCollisionQueryParams, defaultResponseParams))
 			{
 				DrawDebugLine(GetWorld(), start, static_cast<FVector>(hitBlue.ImpactPoint), FColor::Blue, false, 0.1f, 0, 1);
-				OnForcePerspective(currentItem);
+				
+				angularSize = AngularSize();
+				OnForcePerspective(currentItem, angularSize);
 			}
 		}
 	}
@@ -98,6 +101,68 @@ void AFPCharacter::Tick(float deltaTime_)
 		}
 	}
 }
+
+void AFPCharacter::OnForcePerspective(AInteractableObject* object_, float& angSize_)
+{
+	FVector endLoc;
+
+	FHitResult downHit;
+	FVector st = object_->GetRootComponent()->GetComponentLocation();
+	FVector ed = st + FVector(0, 0, -1.001f) * object_->GetRootComponent()->Bounds.SphereRadius;
+
+	if (GetWorld()->LineTraceSingleByChannel(downHit, st, ed, ECC_Visibility, holdingCollisionQueryParams, defaultResponseParams))
+	{
+		endLoc = GroundCheck(downHit);
+	}
+	else
+	{
+		endLoc = static_cast<FVector>(hitBlue.ImpactPoint + (hitBlue.ImpactNormal * currentItem->GetRootComponent()->Bounds.SphereRadius));
+	}
+
+	endLoc = static_cast<FVector>(hitBlue.ImpactPoint + (hitBlue.ImpactNormal * object_->GetRootComponent()->Bounds.SphereRadius));
+	
+	float dist = FMath::Abs((endLoc - cameraComponent->GetComponentLocation()).Size());
+	float newBoundRad;
+	float boundDiam = 2 * object_->GetRootComponent()->Bounds.SphereRadius;
+
+	newBoundRad = 2 * (UKismetMathLibrary::DegTan(angSize_/2) * dist);
+
+	itemScaleFactor = newBoundRad / (boundDiam * 2);
+
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("scaleFactor: %f"), itemScaleFactor));
+	}
+
+	object_->SetScaleFactor(itemScaleFactor);
+	object_->SetActorLocation(endLoc);
+}
+
+FVector AFPCharacter::GroundCheck(FHitResult ht_)
+{
+	float hyp = ht_.Distance;
+	float adj = cameraComponent->GetComponentTransform().GetLocation().Z;
+	float uAng = UKismetMathLibrary::DegAcos(adj/hyp);
+	float oAng = 180 - 90 - uAng;
+
+	float height = currentItem->GetRootComponent()->Bounds.SphereRadius;
+
+	float offset = height/UKismetMathLibrary::DegTan(oAng) + height;
+	FVector dir = hitBlue.TraceStart - hitBlue.ImpactPoint;
+	dir.Normalize();
+
+	return static_cast<FVector>(ht_.ImpactPoint + (dir * offset));
+}
+
+float AFPCharacter::AngularSize()
+{
+	FVector displacement = currentItem->GetActorLocation() - cameraComponent->GetComponentLocation();
+	float initDist = FMath::Abs(displacement.Size());
+	float boundDiam = 2 * currentItem->GetRootComponent()->Bounds.SphereRadius;
+
+	 return (2 * UKismetMathLibrary::DegAtan2(boundDiam, (2 * initDist)));
+}
+
 
 // Called to bind functionality to input
 void AFPCharacter::SetupPlayerInputComponent(UInputComponent* playerInputComponent_)
@@ -215,6 +280,11 @@ void AFPCharacter::ToggleItemPickup()
 	if(currentItem)
 	{
 		bHoldingItem = !bHoldingItem;
+
+		if(bHoldingItem)
+		{
+		}
+
 		currentItem->Pickup();
 
 		if(!bHoldingItem)
@@ -222,30 +292,4 @@ void AFPCharacter::ToggleItemPickup()
 			currentItem = nullptr;
 		}
 	}
-}
-
-void AFPCharacter::OnForcePerspective(AInteractableObject* object_)
-{
-	float angularSize;
-	FVector displacement = object_->GetActorLocation() - cameraComponent->GetComponentLocation();
-	float initDist = FMath::Abs(displacement.Size());
-	FVector endLoc = static_cast<FVector>(hitBlue.ImpactPoint) + (hitBlue.ImpactNormal * currentItem->GetRootComponent()->Bounds.SphereRadius - 1);
-	float dist = FMath::Abs((endLoc - cameraComponent->GetComponentLocation()).Size());
-	float newBoundRad;
-	float boundDiam = 2 * object_->GetRootComponent()->Bounds.SphereRadius;
-	
-
-	angularSize = 2 * UKismetMathLibrary::DegAtan(boundDiam /(2 * initDist));
-
-	newBoundRad = 2 * (UKismetMathLibrary::DegTan(angularSize/2) * dist);
-
-	itemScaleFactor = newBoundRad / (boundDiam * 2);
-
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("scaleFactor: %f"), itemScaleFactor));
-	}
-
-	currentItem->SetScaleFactor(itemScaleFactor);
-	currentItem->SetActorLocation(endLoc);
 }
