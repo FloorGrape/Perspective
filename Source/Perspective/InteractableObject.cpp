@@ -17,6 +17,8 @@ AInteractableObject::AInteractableObject()
 
 	bHolding = false;
 	bGravity = true;
+	scaleFactor = 2.0f;
+	originScale = this->GetActorScale();
 }
 
 // Called when the game starts or when spawned
@@ -65,6 +67,7 @@ void AInteractableObject::Tick(float DeltaTime)
 	if(bHolding && holdingComp)
 	{
 		SetActorLocationAndRotation(holdingComp->GetComponentLocation(), holdingComp->GetComponentRotation());
+		this->SetActorScale3D(originScale * scaleFactor);
 	}
 }
 

@@ -47,4 +47,10 @@ public:
 	FVector forwardVec;
 	ACharacter* MyCharacter;
 	UCameraComponent* playerCam;
+
+	UPROPERTY(VisibleAnywhere)
+		float scaleFactor;
+
+	UPROPERTY(VisibleAnywhere)
+		FVector originScale;
 };

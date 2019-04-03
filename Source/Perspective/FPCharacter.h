@@ -56,6 +56,11 @@ public:
 	UPROPERTY(VisibleAnywhere)
 		FVector forwardVec;
 
+	UPROPERTY(VisibleAnywhere)
+		float distance;
+
+	float vertFOV = 59.0f;
+
 	FVector end;
 
 	FHitResult hit;
@@ -104,4 +109,5 @@ protected:
 
 	void ToggleMovement();
 	void ToggleItemPickup();
+	void OnForcePerspective(AInteractableObject* object_);
 };

@@ -4,6 +4,7 @@
 #include "Perspective.h"
 #include "Components/InputComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include <string>
 
 // Sets default values
 AFPCharacter::AFPCharacter()
@@ -21,12 +22,12 @@ AFPCharacter::AFPCharacter()
 
 	holdingComponent = CreateDefaultSubobject<USceneComponent>(TEXT("HoldingComponent"));
 	holdingComponent->SetupAttachment(cameraComponent);
-	holdingComponent->SetRelativeLocation(FVector(250.0f, 0.0f, -40.0f));
-	//holdingComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+	holdingComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 
 	currentItem = nullptr;
 	bCanMove = true;
 	bInspecting = false;
+	distance = 0.0f;
 }
 
 // Called when the game starts or when spawned
@@ -58,16 +59,41 @@ void AFPCharacter::Tick(float deltaTime_)
 		if (GetWorld()->LineTraceSingleByChannel(hit, start, end, ECC_Visibility, defaultComponentQueryParams, defaultResponseParams))
 		{
 			currentItem = Cast<AInteractableObject>(hit.GetActor());
-			if (currentItem) {
-				holdingComponent->SetRelativeLocation(GetTransform().InverseTransformPosition(hit.GetActor()->GetActorLocation()));
-			}
-			if (GEngine) {
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Hit."));
+
+			if (currentItem) 
+			{
+				FVector localCoord = GetTransform().InverseTransformPosition(hit.GetActor()->GetActorLocation());
+				holdingComponent->SetRelativeLocation(FVector(localCoord.X, 0.0f, 0.0f));
 			}
 		}
 		else
 		{
 			currentItem = nullptr;
+		}
+	}
+	else if (bHoldingItem)
+	{
+		if (currentItem)
+		{
+			FVector origin;
+			FVector boxExtent;
+			currentItem->GetActorBounds(false, origin, boxExtent);
+			FVector st = currentItem->GetActorLocation() + (forwardVec * boxExtent.X);
+			FVector ed = st + forwardVec * 5000.0f;
+			FHitResult ht;
+
+			if (GetWorld()->LineTraceSingleByChannel(ht, st, ed, ECC_Visibility, defaultComponentQueryParams, defaultResponseParams))
+			{
+				
+				DrawDebugLine(GetWorld(), st, ed, FColor::Green, false, 0.1f, 0, 1);
+				
+				distance = hit.Distance + ht.Distance;
+
+				if (GEngine) 
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red,	FString::Printf(TEXT("%f"), distance));
+				}
+			}
 		}
 	}
 
@@ -83,7 +109,7 @@ void AFPCharacter::Tick(float deltaTime_)
 		}
 		else
 		{
-			cameraComponent->SetFieldOfView(FMath::Lerp(cameraComponent->FieldOfView, 45.0f, 0.1f));
+			//cameraComponent->SetFieldOfView(FMath::Lerp(cameraComponent->FieldOfView, 45.0f, 0.1f));
 		}
 	}
 	else
@@ -214,4 +240,17 @@ void AFPCharacter::ToggleItemPickup()
 			currentItem = nullptr;
 		}
 	}
+}
+
+void AFPCharacter::OnForcePerspective(AInteractableObject* object_)
+{
+	float angularSize;
+	float dist = distance;
+	float scaleFactor;
+	FVector scale = object_->GetActorScale();
+	FVector newScale;
+
+	angularSize = 2 * atan(scale.Y/(2 * dist));
+
+	scaleFactor = 2 * tan(angularSize/2) * dist;
 }
