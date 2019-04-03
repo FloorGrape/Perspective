@@ -40,6 +40,12 @@ public:
 	UFUNCTION()
 	void Pickup();
 
+	UFUNCTION()
+	void UpdateScale(float newScale_);
+
+	FVector GetOriginScale();
+	void SetOriginScale(FVector newScale_);
+
 	bool bHolding;
 	bool bGravity;
 

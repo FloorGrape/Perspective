@@ -106,8 +106,8 @@ protected:
 	void OnInteract();
 	void OnInspect();
 	void OnInspectReleased();
-
+	void OnForcePerspective(AInteractableObject* object_);
 	void ToggleMovement();
 	void ToggleItemPickup();
-	void OnForcePerspective(AInteractableObject* object_);
+
 };

@@ -17,7 +17,7 @@ AInteractableObject::AInteractableObject()
 
 	bHolding = false;
 	bGravity = true;
-	scaleFactor = 2.0f;
+	scaleFactor = 1.0f;
 	originScale = this->GetActorScale();
 }
 
@@ -68,6 +68,7 @@ void AInteractableObject::Tick(float DeltaTime)
 	{
 		SetActorLocationAndRotation(holdingComp->GetComponentLocation(), holdingComp->GetComponentRotation());
 		this->SetActorScale3D(originScale * scaleFactor);
+
 	}
 }
 
@@ -90,7 +91,22 @@ void AInteractableObject::Pickup()
 	if(!bHolding)
 	{
 		forwardVec = playerCam->GetForwardVector();
+		SetOriginScale(this->GetActorScale());
 		//mesh->AddForce(forwardVec * 100000 * mesh->GetMass());
 	}
 }
 
+void AInteractableObject::UpdateScale(float newScale_)
+{
+	scaleFactor = newScale_;
+}
+
+FVector AInteractableObject::GetOriginScale()
+{
+	return originScale;
+}
+
+void AInteractableObject::SetOriginScale(FVector newScale_)
+{
+	originScale = newScale_;
+}

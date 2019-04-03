@@ -3,8 +3,8 @@
 #include "FPCharacter.h"
 #include "Perspective.h"
 #include "Components/InputComponent.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include <string>
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 AFPCharacter::AFPCharacter()
@@ -74,12 +74,12 @@ void AFPCharacter::Tick(float deltaTime_)
 	else if (bHoldingItem)
 	{
 		if (currentItem)
-		{
+		{	
 			FVector origin;
 			FVector boxExtent;
 			currentItem->GetActorBounds(false, origin, boxExtent);
 			FVector st = currentItem->GetActorLocation() + (forwardVec * boxExtent.X);
-			FVector ed = st + forwardVec * 5000.0f;
+			FVector ed = st + forwardVec * 50000.0f;
 			FHitResult ht;
 
 			if (GetWorld()->LineTraceSingleByChannel(ht, st, ed, ECC_Visibility, defaultComponentQueryParams, defaultResponseParams))
@@ -89,10 +89,8 @@ void AFPCharacter::Tick(float deltaTime_)
 				
 				distance = hit.Distance + ht.Distance;
 
-				if (GEngine) 
-				{
-					GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red,	FString::Printf(TEXT("%f"), distance));
-				}
+
+				OnForcePerspective(static_cast<AInteractableObject*>(hit.GetActor()));
 			}
 		}
 	}
@@ -107,14 +105,6 @@ void AFPCharacter::Tick(float deltaTime_)
 			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->ViewPitchMin = -179.90000002f;
 			currentItem->RotateActor();
 		}
-		else
-		{
-			//cameraComponent->SetFieldOfView(FMath::Lerp(cameraComponent->FieldOfView, 45.0f, 0.1f));
-		}
-	}
-	else
-	{
-		cameraComponent->SetFieldOfView(FMath::Lerp(cameraComponent->FieldOfView, 90.0f, 0.1f));
 	}
 }
 
@@ -246,11 +236,22 @@ void AFPCharacter::OnForcePerspective(AInteractableObject* object_)
 {
 	float angularSize;
 	float dist = distance;
+	FVector scale = object_->GetOriginScale();
+	float size = scale.Y;
+	float newSize;
 	float scaleFactor;
-	FVector scale = object_->GetActorScale();
-	FVector newScale;
 
-	angularSize = 2 * atan(scale.Y/(2 * dist));
+	angularSize = 2 * UKismetMathLibrary::DegAtan(scale.Y/(2 * dist));
 
-	scaleFactor = 2 * tan(angularSize/2) * dist;
+	newSize = 2 * UKismetMathLibrary::DegTan(angularSize / 2) * dist;
+
+	scaleFactor = newSize / size;
+
+
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("%f"), scale));
+	}
+
+	object_->UpdateScale(scaleFactor);
 }
