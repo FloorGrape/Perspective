@@ -15,13 +15,13 @@ class PERSPECTIVE_API AFPCharacter : public ACharacter
 	GENERATED_BODY()
 
 	UPROPERTY(VisibleAnywhere)
-		float maxWalkSpeed = 5.0f;
+		float maxWalkSpeed = 500.0f;
 
 	UPROPERTY(VisibleAnywhere)
-		float sprintModifier = 5.0f;
+		float sprintModifier = 3.0f;
 
 	UPROPERTY(VisibleAnywhere)
-		float maxInteractionDist = 5000.0f;
+		float maxInteractionDist = 10000.0f;
 
 	UPROPERTY(EditAnywhere)
 		UCameraComponent* cameraComponent;
@@ -65,7 +65,8 @@ public:
 
 	FHitResult hit;
 
-	FComponentQueryParams defaultComponentQueryParams;
+	FCollisionQueryParams defaultCollisionQueryParams;
+	FCollisionQueryParams holdingCollisionQueryParams;
 	FCollisionResponseParams defaultResponseParams;
 
 protected:

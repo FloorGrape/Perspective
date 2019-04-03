@@ -40,7 +40,10 @@ public:
 	UFUNCTION()
 	void Pickup();
 
+	void SetInspecting(bool v_);
+
 	bool bHolding;
+	bool bInspecting;
 	bool bGravity;
 
 	FRotator controlRot;
@@ -50,6 +53,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 		float scaleFactor;
+
+	UFUNCTION()
+		void SetScaleFactor(const float scale_);
 
 	UPROPERTY(VisibleAnywhere)
 		FVector originScale;

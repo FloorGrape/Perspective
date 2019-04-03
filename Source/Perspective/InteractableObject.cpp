@@ -17,7 +17,7 @@ AInteractableObject::AInteractableObject()
 
 	bHolding = false;
 	bGravity = true;
-	scaleFactor = 2.0f;
+	scaleFactor = 1.0f;
 	originScale = this->GetActorScale();
 }
 
@@ -66,8 +66,16 @@ void AInteractableObject::Tick(float DeltaTime)
 
 	if(bHolding && holdingComp)
 	{
-		SetActorLocationAndRotation(holdingComp->GetComponentLocation(), holdingComp->GetComponentRotation());
-		this->SetActorScale3D(originScale * scaleFactor);
+		if (bInspecting)
+		{
+			SetActorLocationAndRotation(holdingComp->GetComponentLocation(), holdingComp->GetComponentRotation());
+		}
+		else
+		{
+			SetActorLocation(holdingComp->GetComponentLocation());
+		}
+
+		this->SetActorScale3D(FVector(scaleFactor));
 	}
 }
 
@@ -82,15 +90,24 @@ void AInteractableObject::Pickup()
 	bHolding = !bHolding;
 	bGravity = !bGravity;
 	mesh->SetEnableGravity(bGravity);
-	//mesh->SetSimulatePhysics(bHolding ? false : true);
-	mesh->SetSimulatePhysics(true);
-	//mesh->SetCollisionEnabled(bHolding ? ECollisionEnabled::NoCollision : ECollisionEnabled::QueryAndPhysics);
-	mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	mesh->SetSimulatePhysics(bHolding ? false : true);
+	//mesh->SetSimulatePhysics(true);
+	mesh->SetCollisionEnabled(bHolding ? ECollisionEnabled::NoCollision : ECollisionEnabled::QueryAndPhysics);
+	//mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	if(!bHolding)
 	{
 		forwardVec = playerCam->GetForwardVector();
-		//mesh->AddForce(forwardVec * 100000 * mesh->GetMass());
 	}
+}
+
+void AInteractableObject::SetInspecting(bool v_)
+{
+	bInspecting = v_;
+}
+
+void AInteractableObject::SetScaleFactor(const float scale_)
+{
+	scaleFactor = scale_;
 }
 
