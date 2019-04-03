@@ -64,10 +64,13 @@ public:
 	FVector end;
 
 	FHitResult hit;
+	FHitResult hitBlue;
 
 	FCollisionQueryParams defaultCollisionQueryParams;
 	FCollisionQueryParams holdingCollisionQueryParams;
 	FCollisionResponseParams defaultResponseParams;
+
+	float itemScaleFactor;
 
 protected:
 

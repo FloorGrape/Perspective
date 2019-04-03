@@ -73,9 +73,9 @@ void AInteractableObject::Tick(float DeltaTime)
 		else
 		{
 			SetActorLocation(holdingComp->GetComponentLocation());
-		}
 
-		this->SetActorScale3D(FVector(scaleFactor));
+			RootComponent->SetWorldScale3D(FVector(scaleFactor));
+		}
 	}
 }
 

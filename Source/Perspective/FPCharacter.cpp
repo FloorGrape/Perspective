@@ -80,10 +80,9 @@ void AFPCharacter::Tick(float deltaTime_)
 			holdingCollisionQueryParams.AddIgnoredActor(currentItem);
 			end = start + forwardVec * 10000.0f;
 
-			if (GetWorld()->LineTraceSingleByChannel(hit, start, end, ECC_Visibility, holdingCollisionQueryParams, defaultResponseParams))
+			if (GetWorld()->LineTraceSingleByChannel(hitBlue, start, end, ECC_Visibility, holdingCollisionQueryParams, defaultResponseParams))
 			{
-				DrawDebugLine(GetWorld(), start, static_cast<FVector>(hit.ImpactPoint), FColor::Blue, false, 0.1f, 0, 1);
-				distance = hit.Distance;
+				DrawDebugLine(GetWorld(), start, static_cast<FVector>(hitBlue.ImpactPoint), FColor::Blue, false, 0.1f, 0, 1);
 				OnForcePerspective(currentItem);
 			}
 		}
@@ -229,23 +228,24 @@ void AFPCharacter::OnForcePerspective(AInteractableObject* object_)
 {
 	float angularSize;
 	FVector displacement = object_->GetActorLocation() - cameraComponent->GetComponentLocation();
-	float initDist = displacement.Size();
-	float dist = FVector(static_cast<FVector>(hit.ImpactPoint) - cameraComponent->GetComponentLocation()).Size();
+	float initDist = FMath::Abs(displacement.Size());
+	FVector endLoc = static_cast<FVector>(hitBlue.ImpactPoint) + (hitBlue.ImpactNormal * currentItem->GetRootComponent()->Bounds.SphereRadius - 1);
+	float dist = FMath::Abs((endLoc - cameraComponent->GetComponentLocation()).Size());
 	float newBoundRad;
-	float boundRad = object_->GetRootComponent()->Bounds.SphereRadius;
-	float scaleFactor;
+	float boundDiam = 2 * object_->GetRootComponent()->Bounds.SphereRadius;
+	
 
-	angularSize = 2 * UKismetMathLibrary::DegAtan((2 * boundRad)/(2 * initDist));
+	angularSize = 2 * UKismetMathLibrary::DegAtan(boundDiam /(2 * initDist));
 
 	newBoundRad = 2 * (UKismetMathLibrary::DegTan(angularSize/2) * dist);
 
-	scaleFactor = newBoundRad / (boundRad *2);
+	itemScaleFactor = newBoundRad / (boundDiam * 2);
 
 	if (GEngine)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("scaleFactor: %f"), scaleFactor));
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("scaleFactor: %f"), itemScaleFactor));
 	}
 
-	//object_->SetScaleFactor(scaleFactor);
-	object_->SetActorLocation(static_cast<FVector>(hit.ImpactPoint));
+	currentItem->SetScaleFactor(itemScaleFactor);
+	currentItem->SetActorLocation(endLoc);
 }
