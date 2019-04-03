@@ -21,7 +21,7 @@ class PERSPECTIVE_API AFPCharacter : public ACharacter
 		float sprintModifier = 3.0f;
 
 	UPROPERTY(VisibleAnywhere)
-		float maxInteractionDist = 5000.0f;
+		float maxInteractionDist = 10000.0f;
 
 	UPROPERTY(EditAnywhere)
 		UCameraComponent* cameraComponent;
@@ -66,13 +66,16 @@ public:
 	FVector end;
 
 	FHitResult hit;
-	FHitResult hitBlue;
 
 	FCollisionQueryParams defaultCollisionQueryParams;
 	FCollisionQueryParams holdingCollisionQueryParams;
 	FCollisionResponseParams defaultResponseParams;
 
 	float itemScaleFactor;
+
+	// attempt
+
+
 
 protected:
 
@@ -115,7 +118,8 @@ protected:
 
 	void ToggleMovement();
 	void ToggleItemPickup();
-	void OnForcePerspective(AInteractableObject* object_, float& angSize_);
+	void OnForcePerspective(AInteractableObject* object_, const float angSize_, const FHitResult result_);
 	FVector GroundCheck(FHitResult ht_);
-	float AngularSize();
+	float AngularSize(const AInteractableObject* object_) const;
+	float ActualSize(const float angSize_, const float dist_) const;
 };

@@ -17,7 +17,7 @@ AInteractableObject::AInteractableObject()
 
 	bHolding = false;
 	bGravity = true;
-	scaleFactor = 1.0f;
+	scaleFactor = this->RootComponent->GetComponentScale().X;
 	originScale = this->GetActorScale();
 }
 
@@ -73,8 +73,8 @@ void AInteractableObject::Tick(float DeltaTime)
 		else
 		{
 			SetActorLocation(holdingComp->GetComponentLocation());
-
-			RootComponent->SetWorldScale3D(FVector(scaleFactor));
+			
+			//this->SetActorScale3D(FVector(scaleFactor));
 		}
 	}
 }
