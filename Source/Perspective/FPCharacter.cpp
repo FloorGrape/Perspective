@@ -97,10 +97,9 @@ void AFPCharacter::Tick(float deltaTime_)
 
 void AFPCharacter::OnForcePerspective(const float prevSize_, FHitResult result_)
 {
-	/*
-	FHitResult downHit;
-	FVector st = object_->GetActorLocation();
-	FVector ed = st + FVector(0, 0, -1.0f) * object_->GetRootComponent()->Bounds.SphereRadius;
+	/*FHitResult downHit;
+	FVector st = currentItem->GetActorLocation();
+	FVector ed = st + FVector(0, 0, -1.0f) * currentItem->GetRootComponent()->Bounds.SphereRadius;
 
 	if (GetWorld()->LineTraceSingleByChannel(downHit, st, ed, ECC_Visibility, holdingCollisionQueryParams, defaultResponseParams))
 	{
@@ -108,7 +107,7 @@ void AFPCharacter::OnForcePerspective(const float prevSize_, FHitResult result_)
 	}
 	else
 	{
-		endLoc = static_cast<FVector>(hitBlue.ImpactPoint + (hitBlue.ImpactNormal * object_->GetRootComponent()->Bounds.SphereRadius));
+		endLoc = cameraComponent->GetComponentLocation() + forwardVec * distance;
 	}*/
 
 	//if(result_.bBlockingHit)
@@ -122,7 +121,34 @@ void AFPCharacter::OnForcePerspective(const float prevSize_, FHitResult result_)
 	//}
 
 	endLoc = cameraComponent->GetComponentLocation() + forwardVec * distance;
+	
+	actualSize = ActualSize(angularSize, Distance(cameraComponent->GetComponentLocation(), endLoc));
 
+	if(result_.bBlockingHit)
+	{
+		if(result_.ImpactNormal.Z > 0.1f && result_.ImpactNormal.Z > -0.1f)
+		{
+			float camHeight = cameraComponent->GetComponentLocation().Z;
+			float rayDist = distance;
+			//float horDist = FMath::Sqrt(FMath::Square(rayDist) - FMath::Square(camHeight));
+			float angle = UKismetMathLibrary::DegAsin(camHeight/rayDist);
+			float objHeight = actualSize/2;
+			float moveDist = objHeight / UKismetMathLibrary::DegSin(angle);
+			
+			if(GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("camHeight: %f, rayDist: %f, angle: %f, objHeight: %f, moveDist: %f"), 
+					camHeight, rayDist, angle, objHeight, moveDist));
+			}
+
+			endLoc = result_.ImpactPoint - (forwardVec * moveDist);
+		}
+		else
+		{	
+			endLoc = result_.ImpactPoint + (result_.ImpactNormal * currentItem->GetRootComponent()->Bounds.SphereRadius);
+		}
+	}
+	
 	actualSize = ActualSize(angularSize, Distance(cameraComponent->GetComponentLocation(), endLoc));
 
 	itemScaleFactor = actualSize / prevSize_;
@@ -133,9 +159,9 @@ void AFPCharacter::OnForcePerspective(const float prevSize_, FHitResult result_)
 	if (GEngine)
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Bounding Rad: %f"), object_->GetRootComponent()->Bounds.SphereRadius));
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red,
+		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red,
 			FString::Printf(TEXT("actualSize: %f, angularSize: %f, scaleFactor: %f, prevSize: %f"),
-				actualSize, angularSize, itemScaleFactor, prevSize_));
+				actualSize, angularSize, itemScaleFactor, prevSize_));*/
 
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("NewLoc(%f, %f, %f)"), endLoc.X, endLoc.Y, endLoc.Z));
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Distance: %f"), distance));
