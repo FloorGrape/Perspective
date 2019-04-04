@@ -59,4 +59,10 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 		FVector originScale;
+
+	UFUNCTION()
+	void SetOriginScale(FVector oldScale_);
+
+	UFUNCTION()
+	FVector GetOriginScale();
 };
