@@ -133,9 +133,9 @@ void AFPCharacter::OnForcePerspective(const float prevSize_, FHitResult result_)
 	if (GEngine)
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Bounding Rad: %f"), object_->GetRootComponent()->Bounds.SphereRadius));
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red,
-			FString::Printf(TEXT("actualSize: %f, angularSize: %f, scaleFactor: %f, prevSize: %f"),
-				actualSize, angularSize, itemScaleFactor, prevSize_));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red,
+			//FString::Printf(TEXT("actualSize: %f, angularSize: %f, scaleFactor: %f, prevSize: %f"),
+				//actualSize, angularSize, itemScaleFactor, prevSize_));
 
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("NewLoc(%f, %f, %f)"), endLoc.X, endLoc.Y, endLoc.Z));
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Distance: %f"), distance));
@@ -151,8 +151,8 @@ FVector AFPCharacter::GroundCheck(FHitResult ht_)
 
 	if (GEngine)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Upper Angle: %f"), uAng));
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black, FString::Printf(TEXT("Opposite Angle: %f"), oAng));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Upper Angle: %f"), uAng));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black, FString::Printf(TEXT("Opposite Angle: %f"), oAng));
 	}
 
 	float height = currentItem->GetRootComponent()->Bounds.SphereRadius;
