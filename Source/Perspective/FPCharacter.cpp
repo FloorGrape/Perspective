@@ -177,8 +177,8 @@ FVector AFPCharacter::GroundCheck(FHitResult ht_)
 
 	if (GEngine)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Upper Angle: %f"), uAng));
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black, FString::Printf(TEXT("Opposite Angle: %f"), oAng));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Upper Angle: %f"), uAng));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black, FString::Printf(TEXT("Opposite Angle: %f"), oAng));
 	}
 
 	float height = currentItem->GetRootComponent()->Bounds.SphereRadius;
