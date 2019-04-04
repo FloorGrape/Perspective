@@ -27,9 +27,6 @@ class PERSPECTIVE_API AFPCharacter : public ACharacter
 		UCameraComponent* cameraComponent;
 
 	UPROPERTY(EditAnywhere)
-		ASwitch* currentSwitch;
-
-	UPROPERTY(EditAnywhere)
 		class USceneComponent* holdingComponent;
 		
 public:
@@ -51,8 +48,6 @@ public:
 	FVector holdingComp;
 	FRotator lastRotation;
 
-	FVector start;
-
 	UPROPERTY(VisibleAnywhere)
 		FVector forwardVec;
 
@@ -61,10 +56,8 @@ public:
 
 	float angularSize;
 
-	float vertFOV = 59.0f;
-
+	FVector start;
 	FVector end;
-
 	FHitResult hit;
 
 	FCollisionQueryParams defaultCollisionQueryParams;
@@ -118,8 +111,9 @@ protected:
 
 	void ToggleMovement();
 	void ToggleItemPickup();
-	void OnForcePerspective(AInteractableObject* object_, const float angSize_, const FHitResult result_);
+	void OnForcePerspective(AInteractableObject* object_, const float angSize_, const float prevSize_, FHitResult result_);
 	FVector GroundCheck(FHitResult ht_);
 	float AngularSize(const AInteractableObject* object_) const;
 	float ActualSize(const float angSize_, const float dist_) const;
+	float Distance(const FVector posA_, const FVector posB_) const;
 };
