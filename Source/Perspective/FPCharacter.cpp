@@ -52,7 +52,7 @@ void AFPCharacter::Tick(float deltaTime_)
 			if (currentItem)
 			{
 				end = start + forwardVec * FVector(currentItem->GetActorLocation() - GetTransform().GetLocation()).Size();
-				DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 0.1f, 0, 1);
+				//DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 0.1f, 0, 1);
 
 				float x = (hit.GetActor()->GetActorLocation() - cameraComponent->GetComponentLocation()).Size();
 				holdingComponent->SetRelativeLocation(FVector(x, 0.0f, 0.0f));
@@ -72,7 +72,7 @@ void AFPCharacter::Tick(float deltaTime_)
 
 			if (GetWorld()->LineTraceSingleByChannel(hit, start, end, ECC_Visibility, holdingCollisionQueryParams, defaultResponseParams))
 			{
-				DrawDebugLine(GetWorld(), start, static_cast<FVector>(hit.ImpactPoint), FColor::Blue, false, 0.1f, 0, 1);
+				//DrawDebugLine(GetWorld(), start, static_cast<FVector>(hit.ImpactPoint), FColor::Blue, false, 0.1f, 0, 1);
 				distance = Distance(start, hit.ImpactPoint);
 			}
 			else
