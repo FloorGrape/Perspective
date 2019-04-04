@@ -55,10 +55,13 @@ public:
 		float distance;
 
 	float angularSize;
+	float actualSize;
 
 	FVector start;
 	FVector end;
 	FHitResult hit;
+
+	FVector endLoc;
 
 	FCollisionQueryParams defaultCollisionQueryParams;
 	FCollisionQueryParams holdingCollisionQueryParams;
@@ -111,7 +114,7 @@ protected:
 
 	void ToggleMovement();
 	void ToggleItemPickup();
-	void OnForcePerspective(AInteractableObject* object_, const float angSize_, const float prevSize_, FHitResult result_);
+	void OnForcePerspective(const float prevSize_, FHitResult result_);
 	FVector GroundCheck(FHitResult ht_);
 	float AngularSize(const AInteractableObject* object_) const;
 	float ActualSize(const float angSize_, const float dist_) const;

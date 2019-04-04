@@ -39,7 +39,7 @@ void AFPCharacter::BeginPlay()
 void AFPCharacter::Tick(float deltaTime_)
 {
 	Super::Tick(deltaTime_);
-	start = cameraComponent->GetComponentLocation(); 
+	start = cameraComponent->GetComponentLocation();
 	end = start + forwardVec * maxInteractionDist;
 	forwardVec = cameraComponent->GetForwardVector();
 
@@ -49,10 +49,8 @@ void AFPCharacter::Tick(float deltaTime_)
 		{
 			currentItem = Cast<AInteractableObject>(hit.GetActor());
 
-			if (currentItem) 
+			if (currentItem)
 			{
-				angularSize = AngularSize(currentItem);
-
 				end = start + forwardVec * FVector(currentItem->GetActorLocation() - GetTransform().GetLocation()).Size();
 				DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 0.1f, 0, 1);
 
@@ -75,14 +73,14 @@ void AFPCharacter::Tick(float deltaTime_)
 			if (GetWorld()->LineTraceSingleByChannel(hit, start, end, ECC_Visibility, holdingCollisionQueryParams, defaultResponseParams))
 			{
 				DrawDebugLine(GetWorld(), start, static_cast<FVector>(hit.ImpactPoint), FColor::Blue, false, 0.1f, 0, 1);
-				distance = (hit.ImpactPoint - start).Size();
+				distance = Distance(start, hit.ImpactPoint);
 			}
 			else
 			{
 				distance = maxInteractionDist;
 			}
 
-			OnForcePerspective(currentItem, angularSize, 2 * currentItem->GetRootComponent()->Bounds.SphereRadius, hit);
+			OnForcePerspective(2 * currentItem->GetRootComponent()->Bounds.SphereRadius, hit);
 		}
 	}
 
@@ -97,9 +95,8 @@ void AFPCharacter::Tick(float deltaTime_)
 	}
 }
 
-void AFPCharacter::OnForcePerspective(AInteractableObject* object_, const float angSize_, const float prevSize_, FHitResult result_)
+void AFPCharacter::OnForcePerspective(const float prevSize_, FHitResult result_)
 {
-	FVector endLoc;
 	/*
 	FHitResult downHit;
 	FVector st = object_->GetActorLocation();
@@ -114,37 +111,42 @@ void AFPCharacter::OnForcePerspective(AInteractableObject* object_, const float 
 		endLoc = static_cast<FVector>(hitBlue.ImpactPoint + (hitBlue.ImpactNormal * object_->GetRootComponent()->Bounds.SphereRadius));
 	}*/
 
-	if(result_.bBlockingHit)
-	{
-		//endLoc = static_cast<FVector>(result_.ImpactPoint + (result_.ImpactNormal * object_->GetRootComponent()->Bounds.SphereRadius));
-		endLoc = static_cast<FVector>(result_.ImpactPoint);
-	}
-	else
-	{
-		endLoc = cameraComponent->GetComponentLocation() + forwardVec * maxInteractionDist;
-	}
+	//if(result_.bBlockingHit)
+	//{
+	//	//endLoc = static_cast<FVector>(result_.ImpactPoint + (result_.ImpactNormal * object_->GetRootComponent()->Bounds.SphereRadius));
+	//	endLoc = static_cast<FVector>(result_.ImpactPoint);
+	//}
+	//else
+	//{
+	//	endLoc = cameraComponent->GetComponentLocation() + forwardVec * maxInteractionDist;
+	//}
 
-	float as = ActualSize(angSize_, Distance(cameraComponent->GetComponentLocation(), endLoc));
+	endLoc = cameraComponent->GetComponentLocation() + forwardVec * distance;
 
-	itemScaleFactor = as / prevSize_;
+	actualSize = ActualSize(angularSize, Distance(cameraComponent->GetComponentLocation(), endLoc));
+
+	itemScaleFactor = actualSize / prevSize_;
+
+	currentItem->SetActorLocation(endLoc);
+	currentItem->SetActorScale3D(currentItem->GetActorScale3D() * FVector(itemScaleFactor));
 
 	if (GEngine)
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Bounding Rad: %f"), object_->GetRootComponent()->Bounds.SphereRadius));
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, 
-			FString::Printf(TEXT("actualSize: %f, angularSize: %f, scaleFactor: %f, prevSize: %f"), 
-				as, angSize_, itemScaleFactor, prevSize_));
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red,
+			FString::Printf(TEXT("actualSize: %f, angularSize: %f, scaleFactor: %f, prevSize: %f"),
+				actualSize, angularSize, itemScaleFactor, prevSize_));
+
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("NewLoc(%f, %f, %f)"), endLoc.X, endLoc.Y, endLoc.Z));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Distance: %f"), distance));
 	}
-	
-	holdingComponent->SetWorldLocation(endLoc);
-	object_->SetActorScale3D(FVector(itemScaleFactor));
 }
 
 FVector AFPCharacter::GroundCheck(FHitResult ht_)
 {
 	float hyp = ht_.Distance;
 	float adj = cameraComponent->GetComponentTransform().GetLocation().Z;
-	float uAng = UKismetMathLibrary::DegAcos(adj/hyp);
+	float uAng = UKismetMathLibrary::DegAcos(adj / hyp);
 	float oAng = 180 - 90 - uAng;
 
 	if (GEngine)
@@ -155,7 +157,7 @@ FVector AFPCharacter::GroundCheck(FHitResult ht_)
 
 	float height = currentItem->GetRootComponent()->Bounds.SphereRadius;
 
-	float offset = height/UKismetMathLibrary::DegTan(oAng);
+	float offset = height / UKismetMathLibrary::DegTan(oAng);
 	FVector dir = ht_.TraceStart - ht_.ImpactPoint;
 	dir.Normalize();
 
@@ -172,7 +174,7 @@ float AFPCharacter::AngularSize(const AInteractableObject* object_) const
 
 float AFPCharacter::ActualSize(const float angSize_, const float dist_) const
 {
-	return 2 * (UKismetMathLibrary::DegTan(angSize_/2) * dist_);
+	return 2 * (UKismetMathLibrary::DegTan(angSize_ / 2) * dist_);
 }
 
 float AFPCharacter::Distance(const FVector posA_, const FVector posB_) const
@@ -207,7 +209,7 @@ void AFPCharacter::SetupPlayerInputComponent(UInputComponent* playerInputCompone
 
 void AFPCharacter::MoveForward(float value_)
 {
-	if(value_ != 0.0f && bCanMove)
+	if (value_ != 0.0f && bCanMove)
 	{
 		// Find out which way is "forward" and record that the player wants to move that way.
 		FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::X);
@@ -217,7 +219,7 @@ void AFPCharacter::MoveForward(float value_)
 
 void AFPCharacter::MoveRight(float value_)
 {
-	if(value_ != 0.0f && bCanMove)
+	if (value_ != 0.0f && bCanMove)
 	{
 		// Find out which way is "right" and record that the player wants to move that way.
 		FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
@@ -225,29 +227,29 @@ void AFPCharacter::MoveRight(float value_)
 	}
 }
 
-void AFPCharacter::StartJump() 
+void AFPCharacter::StartJump()
 {
 	bPressedJump = true;
 }
 
-void AFPCharacter::StopJump() 
+void AFPCharacter::StopJump()
 {
 	bPressedJump = false;
 }
 
-void AFPCharacter::StartSprint() 
+void AFPCharacter::StartSprint()
 {
 	GetCharacterMovement()->MaxWalkSpeed = maxWalkSpeed * sprintModifier;
 }
 
-void AFPCharacter::StopSprint() 
+void AFPCharacter::StopSprint()
 {
 	GetCharacterMovement()->MaxWalkSpeed = maxWalkSpeed;
 }
 
 void AFPCharacter::OnInteract()
 {
-	if(currentItem && !bInspecting)
+	if (currentItem && !bInspecting)
 	{
 		ToggleItemPickup();
 	}
@@ -255,7 +257,7 @@ void AFPCharacter::OnInteract()
 
 void AFPCharacter::OnInspect()
 {
-	if(bHoldingItem)
+	if (bHoldingItem)
 	{
 		lastRotation = GetControlRotation();
 		ToggleMovement();
@@ -268,7 +270,7 @@ void AFPCharacter::OnInspect()
 
 void AFPCharacter::OnInspectReleased()
 {
-	if(bInspecting && bHoldingItem)
+	if (bInspecting && bHoldingItem)
 	{
 		GetController()->SetControlRotation(lastRotation);
 		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->ViewPitchMax = pitchMax;
@@ -293,14 +295,18 @@ void AFPCharacter::ToggleMovement()
 
 void AFPCharacter::ToggleItemPickup()
 {
-	if(currentItem)
+	if (currentItem)
 	{
 		bHoldingItem = !bHoldingItem;
 
 		currentItem->Pickup();
 
-		if(!bHoldingItem)
+		angularSize = AngularSize(currentItem);
+
+		if (!bHoldingItem)
 		{
+			//currentItem->SetActorLocation(endLoc);
+			//currentItem->SetActorScale3D(currentItem->GetActorScale3D() * FVector(itemScaleFactor));
 			currentItem = nullptr;
 		}
 	}
