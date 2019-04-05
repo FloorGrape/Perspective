@@ -97,58 +97,41 @@ void AFPCharacter::Tick(float deltaTime_)
 
 void AFPCharacter::OnForcePerspective(const float prevSize_, FHitResult result_)
 {
-	/*FHitResult downHit;
-	FVector st = currentItem->GetActorLocation();
-	FVector ed = st + FVector(0, 0, -1.0f) * currentItem->GetRootComponent()->Bounds.SphereRadius;
+	endLoc = cameraComponent->GetComponentLocation() + forwardVec * distance;
 
-	if (GetWorld()->LineTraceSingleByChannel(downHit, st, ed, ECC_Visibility, holdingCollisionQueryParams, defaultResponseParams))
+	//actualSize = ActualSize(angularSize, Distance(cameraComponent->GetComponentLocation(), endLoc));
+
+	if (result_.bBlockingHit)
 	{
-		endLoc = GroundCheck(downHit);
+		//if (result_.ImpactNormal.Z > 0.1f && result_.ImpactNormal.Z > -0.1f)
+		//{
+		//	float camHeight = cameraComponent->GetComponentLocation().Z;
+		//	float rayDist = distance;
+		//	//float horDist = FMath::Sqrt(FMath::Square(rayDist) - FMath::Square(camHeight));
+		//	float angle = UKismetMathLibrary::DegAsin(camHeight / rayDist);
+		//	float objHeight = actualSize / 2;
+		//	float moveDist = objHeight / UKismetMathLibrary::DegSin(angle);
+
+		//	if (GEngine)
+		//	{
+		//		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("camHeight: %f, rayDist: %f, angle: %f, objHeight: %f, moveDist: %f"),
+		//			camHeight, rayDist, angle, objHeight, moveDist));
+		//	}
+
+		//	endLoc = result_.ImpactPoint + (forwardVec.operator-() * (moveDist));
+		//}
+		//else
+		//{
+		//	endLoc = result_.ImpactPoint + (result_.ImpactNormal * currentItem->GetRootComponent()->Bounds.SphereRadius);
+		//}
+
+		endLoc = result_.ImpactPoint + (result_.ImpactNormal * currentItem->GetRootComponent()->Bounds.SphereRadius);
 	}
 	else
 	{
-		endLoc = cameraComponent->GetComponentLocation() + forwardVec * distance;
-	}*/
-
-	//if(result_.bBlockingHit)
-	//{
-	//	//endLoc = static_cast<FVector>(result_.ImpactPoint + (result_.ImpactNormal * object_->GetRootComponent()->Bounds.SphereRadius));
-	//	endLoc = static_cast<FVector>(result_.ImpactPoint);
-	//}
-	//else
-	//{
-	//	endLoc = cameraComponent->GetComponentLocation() + forwardVec * maxInteractionDist;
-	//}
-
-	endLoc = cameraComponent->GetComponentLocation() + forwardVec * distance;
-	
-	actualSize = ActualSize(angularSize, Distance(cameraComponent->GetComponentLocation(), endLoc));
-
-	if(result_.bBlockingHit)
-	{
-		if(result_.ImpactNormal.Z > 0.1f && result_.ImpactNormal.Z > -0.1f)
-		{
-			float camHeight = cameraComponent->GetComponentLocation().Z;
-			float rayDist = distance;
-			//float horDist = FMath::Sqrt(FMath::Square(rayDist) - FMath::Square(camHeight));
-			float angle = UKismetMathLibrary::DegAsin(camHeight/rayDist);
-			float objHeight = actualSize/2;
-			float moveDist = objHeight / UKismetMathLibrary::DegSin(angle);
-			
-			if(GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("camHeight: %f, rayDist: %f, angle: %f, objHeight: %f, moveDist: %f"), 
-					camHeight, rayDist, angle, objHeight, moveDist));
-			}
-
-			endLoc = result_.ImpactPoint + (forwardVec.operator-() * (moveDist));
-		}
-		else
-		{	
-			endLoc = result_.ImpactPoint + (result_.ImpactNormal * currentItem->GetRootComponent()->Bounds.SphereRadius);
-		}
+		endLoc = cameraComponent->GetComponentLocation() + forwardVec * distance;	
 	}
-	
+
 	actualSize = ActualSize(angularSize, Distance(cameraComponent->GetComponentLocation(), endLoc));
 
 	itemScaleFactor = actualSize / prevSize_;
@@ -163,8 +146,8 @@ void AFPCharacter::OnForcePerspective(const float prevSize_, FHitResult result_)
 			FString::Printf(TEXT("actualSize: %f, angularSize: %f, scaleFactor: %f, prevSize: %f"),
 				actualSize, angularSize, itemScaleFactor, prevSize_));*/
 
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("NewLoc(%f, %f, %f)"), endLoc.X, endLoc.Y, endLoc.Z));
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Distance: %f"), distance));
+				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("NewLoc(%f, %f, %f)"), endLoc.X, endLoc.Y, endLoc.Z));
+				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Distance: %f"), distance));
 	}
 }
 
