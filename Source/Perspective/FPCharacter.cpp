@@ -141,7 +141,7 @@ void AFPCharacter::OnForcePerspective(const float prevSize_, FHitResult result_)
 					camHeight, rayDist, angle, objHeight, moveDist));
 			}
 
-			endLoc = result_.ImpactPoint - (forwardVec * moveDist);
+			endLoc = result_.ImpactPoint + (forwardVec.operator-() * (moveDist));
 		}
 		else
 		{	
