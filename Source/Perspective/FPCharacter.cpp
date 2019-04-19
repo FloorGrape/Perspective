@@ -121,7 +121,14 @@ void AFPCharacter::OnForcePerspective(const float prevSize_, FHitResult result_)
 	//	endLoc = cameraComponent->GetComponentLocation() + forwardVec * maxInteractionDist;
 	//}
 
-	endLoc = cameraComponent->GetComponentLocation() + forwardVec * distance;
+	if (result_.bBlockingHit)
+	{
+		endLoc = result_.ImpactPoint + (result_.ImpactNormal * currentItem->GetRootComponent()->Bounds.SphereRadius);
+	}
+	else
+	{
+		endLoc = cameraComponent->GetComponentLocation() + forwardVec * distance;
+	}
 
 	actualSize = ActualSize(angularSize, Distance(cameraComponent->GetComponentLocation(), endLoc));
 
